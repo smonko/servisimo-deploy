@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: servisimo-catalog-service
+  namespace: servisimo
+spec:
+  ports:
+  - port: 8088
+    targetPort: 8088
+    protocol: TCP
+  selector:
+    app: servisimo-catalog
+  type: ClusterIP

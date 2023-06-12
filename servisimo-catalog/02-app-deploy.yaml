@@ -1,0 +1,70 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: servisimo-catalog
+  namespace: "servisimo"
+  annotations:
+    configmap.reloader.stakater.com/reload: "servisimo-catalog-config-map"
+spec:
+  selector:
+    matchLabels:
+      app: servisimo-catalog
+  template:
+    metadata:
+      labels:
+        app: servisimo-catalog
+    spec:
+      containers:
+      - name: "servisimo-catalog"
+        image: 'smonko/servisimo-catalog:main'
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8088
+          protocol: "TCP"
+        resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: '0.5'
+              memory: 512M
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8088
+            scheme: HTTP
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8088
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 2
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        env:
+          - name: JDBC_DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: servisimo-catalog-secrets
+                key:  jdbc.url
+        volumeMounts:
+            - name: config
+              mountPath: /opt/config
+      volumes:
+        - name: config
+          configMap:
+            name: servisimo-catalog-config-map
+      restartPolicy: Always
+  replicas: 1
+  strategy:
+    type: "RollingUpdate"
+    rollingUpdate:
+      maxSurge: "50%"
+      maxUnavailable: "50%"
