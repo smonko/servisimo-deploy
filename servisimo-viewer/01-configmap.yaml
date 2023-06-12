@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: servisimo-catalog-config-map
+  name: servisimo-viewer-config-map
   namespace: servisimo
 data:
   application.yml: |-
     server:
-      port: 8088
+      port: 8089
       error:
         include-message: always
     
@@ -50,7 +50,7 @@ data:
     
     spring:
       application:
-        name: servisimo-catalog
+        name: servisimo-viewer
       cloud:
         consul:
           enebled: true
@@ -84,10 +84,14 @@ data:
           hibernate:
             format_sql: true
     
+    features:
+      canaryflag: true
+      expandedsearch: true
+    
     #custom properties
     info:
       app:
-        name: servisimo-catalog
+        name: servisimo-viewer
         description: Spring Demo application
       author: 
         name: "Stefan Monko"
