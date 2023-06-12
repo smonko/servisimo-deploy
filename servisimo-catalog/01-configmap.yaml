@@ -54,7 +54,7 @@ data:
       cloud:
         consul:
           enebled: true
-          host: localhost
+          host: consul-server
           port: 8500
           discovery:
             prefer-ip-address: true
